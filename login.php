@@ -1,6 +1,6 @@
 <?php
 
-header("Content-Type: text/html; charset=utf8");
+header('Content-Type:text/html;charset=gb2312');
 
 $pdo = new PDO(
     'mysql:host=academic-mysql.cc.gatech.edu;dbname=cs4400_Group_67',
@@ -9,9 +9,8 @@ $pdo = new PDO(
 );
 
 
-
-$usr = 'admin3443';
-$pwd = '0192023a7bbd73250516f069df18b500';
+$usr = $_POST['username'];
+$pwd = $_POST['inputPassword'];
 
 $sth = $pdo->query("SELECT * FROM User where Username = '$usr' and Password = '$pwd'");
 //echo var_dump($sth->fetch());
@@ -20,11 +19,7 @@ if ($sth->fetch()){
 	echo "Mathced\n";
 	exit;
 }else{
-	header("refresh:0;url=sign_in.html");
-	echo "wrong \n";
+	echo "wrong\n";
 }
-
-
-
 
 ?>
