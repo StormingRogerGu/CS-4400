@@ -92,7 +92,7 @@
 	 	$cur_owner = $_GET['cur_owner'];
 
 	 	if (findValidUser($new_owner) === null){
-	 		echo '<script type="text/javascript">alert("Invalid user");</script>';
+	 		echo '<script type="text/javascript">alert("Invalid user"); window.location.href="Breezecard_Management.php"</script>';
 	 	}
 	 	else{
 	 		if (detectConflict($card) !== null){
@@ -112,6 +112,7 @@
 	 			}
 
 	 			ClearConflictions($card);
+	 			Redirect('Breezecard_Management.php');
 
 	 		}
 	 		else{
@@ -120,6 +121,7 @@
 	 				$new_card_num = generateCardnum();
 	 				InsertBreezecard($cur_owner, $new_card_num);
 	 				echo "11";
+	 				Redirect('Breezecard_Management.php');
 	 			}
 	 			
 	 		}
@@ -128,10 +130,10 @@
 	 	echo $new_owner;
 	 	echo $card;
 	 	echo $cur_owner;
-	 	Redirect('Breezecard_Management.php');
+	 	
 
 	 }
-
+////////Manage cards php
 	 if (isset($_GET['new_card'])){
 	 	include 'db_info.php';
 	 	include 'redirect.php';
@@ -139,7 +141,7 @@
 	 	$new_card = $_GET['new_card'];
 	 	//echo $new_card;
 	 	if (checknewCards($new_card) !== null){
-	 		if (isnullowner($new_card) !== null){
+	 		if (isnullowner($new_card,$usr) !== null){
 	 			UpdateCardBelongs($usr, $new_card);
 	 		}else{
 	 			InsertConflict($usr, $new_card);
@@ -160,11 +162,16 @@
 	 	$extra_value = $_GET['extra_value'];
 	 	$new_value_to_card = $cur_value + $extra_value;
 	 	if ($new_value_to_card > 1000){
-	 		echo '<script type="text/javascript">alert("Exceeds 1000");</script>';
-	 	}else{
-	 		updateCardvalue($selected_card, $new_value_to_card);
+	 		echo '<script type="text/javascript">alert("Exceeds 1000"); window.location.href="Manage_Cards.php"</script>';
 	 	}
-	 	Redirect('Manage_Cards.php');
+	 	else if ($new_value_to_card < $cur_value){
+	 		echo '<script type="text/javascript">alert("Please input positive value"); window.location.href="Manage_Cards.php"</script>';
+	 	}
+	 	else{
+	 		updateCardvalue($selected_card, $new_value_to_card);
+	 		Redirect('Manage_Cards.php');
+	 	}
+	 	
 
 	 }
 
@@ -177,23 +184,7 @@
 	 	Redirect('Manage_Cards.php');
 	 }
 
-	 if (isset($_GET['selected_card_wcm'])){
-	 	include 'db_info.php';
-	 	include 'redirect.php';
-	 	$selected_card = $_GET['selected_card_wcm'];
-	 	$stopID = $_GET['station_start'];
-
-	 	$cur_money_qs = Get_user_money($selected_card);
-	 	$cur_money = $cur_money_qs[0]['Value'];
-
-	 	$station_fare_qs = Get_current_fare($stopID);
-	 	$station_fare = $station_fare_qs[0]['EnterFare'];
-
-	 	$new_value_money = $cur_money - $station_fare;
-	 	updateCardValue($selected_card, $new_value_money);
-	 	startTrip($selected_card, $station_fare, $stopID);
-	 	Redirect("Welcome_to_Passengers.php");
-	 }
+	
 
 	if (isset($_GET['selected_card_wcm'])){
 	 	include 'db_info.php';
@@ -206,11 +197,24 @@
 
 	 	$station_fare_qs = Get_current_fare($stopID);
 	 	$station_fare = $station_fare_qs[0]['EnterFare'];
-
+	 	echo $station_fare;
+	 	echo $cur_money;
 	 	$new_value_money = $cur_money - $station_fare;
-	 	updateCardValue($selected_card, $new_value_money);
-	 	startTrip($selected_card, $station_fare, $stopID);
-	 	Redirect("Welcome_to_Passengers.php");
+	 	echo $new_value_money;
+	 	if ($new_value_money > 0){
+	 		echo "11";
+	 		updateCardValue($selected_card, $new_value_money);
+	 		startTrip($selected_card, $station_fare, $stopID);
+	 		Redirect("Welcome_to_Passengers.php");
+	 	}
+	 	else{
+	 		echo "00";
+	 		//sleep(5);
+	 		echo '<script type="text/javascript">alert("No money"); window.location.href = "Welcome_to_Passengers.php"</script>';
+	 		
+	 		//echo '<script type="text/javascript">window.location.href="Welcome_to_Passengers.php"<script type="text/javascript">';
+	 	}
+	 	
 	 }
 
 	 if (isset($_GET['selected_card_end'])){

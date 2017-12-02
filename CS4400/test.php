@@ -25,9 +25,9 @@
 // echo "</table>"
 
 include "db_info.php";
-$a = "55";
-$b = "1111000011110000";
-$S = Get_ongoing_station("Nbus");
+$a = "7";
+$b = "N12345";
+$S = update_fare($a, $b);
 echo $S;
 //echo $S[0]['ClosedStatus'];
 

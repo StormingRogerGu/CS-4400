@@ -98,7 +98,7 @@ Start at <select name="station_start1" id="station_start">;
             
             for ($i = 0; $i < count($station_info); $i++){
                 $current_station = $station_info[$i];
-                $currentfare = $current_station['EnterFare'][0];
+                $currentfare = $current_station['EnterFare'];
 
                 echo "<option value=\"".$current_station['StopID']."\">" . $current_station['Name'] . "-" . $currentfare . "</option>";
             }
@@ -162,13 +162,12 @@ Start at <select name="station_start1" id="station_start">;
     
 </p>
 <br> 
-<input type="submit" value="View Trip History"  name="trip_history">
-<?php
-    if ($_POST['trip_history']){
-        include 'redirect.php';
-        Redirect('View_Trip_History.php');
+<input type="submit" value="View Trip History"  name="trip_history" onclick="jumpto_trip()">
+<script type="text/javascript">
+    function jumpto_trip(){
+        window.location.href = 'View_Trip_History.php'
     }
-?>
+</script>
 
 </form>
 

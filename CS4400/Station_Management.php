@@ -23,10 +23,10 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
   <caption>Monthly savings</caption>
   <thead>
     <tr>
-    <th onclick="sortTable(0)">Station Name</th>
-    <th onclick="sortTable(1)">Stop ID</th>
-    <th onclick="sortValue()">Fare</th>
-    <th onclick="sortTable(3)"">Status</th>
+    <th onclick="sortTable(0)" style="color: blue">Station Name</th>
+    <th onclick="sortTable(1)" style="color: blue">Stop ID</th>
+    <th onclick="sortValue()" style="color: blue">Fare</th>
+    <th onclick="sortTable(3)"" style="color: blue">Status</th>
     </tr>
   </thead>
   <?php
@@ -36,7 +36,13 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
     //while($row = $sdata)
     for ($i = 0; $i < count($sdata); $i++){
       $row = $sdata[$i];
-      echo "<tr><td>" . $row['Name'] . "</td><td>" . $row['StopID'] . "</td><td>" . $row['EnterFare'] . "</td><td>" . $row['ClosedStatus'] . "</td></tr>";
+      $open_status;
+      if ($row['ClosedStatus'] == 0){
+        $open_status = "Open";
+      }else{
+        $open_status = "Closed";
+      }
+      echo "<tr><td>" . $row['Name'] . "</td><td>" . $row['StopID'] . "</td><td>" . $row['EnterFare'] . "</td><td>" . $open_status . "</td></tr>";
     }
     ?>
 </table>
@@ -94,18 +100,21 @@ function sortTable(n) {
     }
   }
 }
+var dir_value = "asc";
 
 function sortValue(){
     var tbl = document.getElementById("station").tBodies[0];
     var store = [];
-    var dir = "asc"
+    
+
     for(var i=0, len=tbl.rows.length; i<len; i++){
         var row = tbl.rows[i];
         var sortnr = parseFloat(row.cells[2].textContent || row.cells[2].innerText);
         if(!isNaN(sortnr)) store.push([sortnr, row]);
     }
 
-    if (dir == "asc"){
+   //alert(store);
+    if (dir_value == "asc"){
       store.sort(function(x,y){
         return x[0] - y[0];
       });
@@ -113,9 +122,9 @@ function sortValue(){
         tbl.appendChild(store[i][1]);
       }
       store = null;
-      dir = "desc"
+      dir_value = "desc";
     }
-    else if (dir == "desc"){
+    else if (dir_value == "desc"){
       store.sort(function(x,y){
         return y[0] - x[0];
       });
@@ -123,21 +132,28 @@ function sortValue(){
         tbl.appendChild(store[i][1]);
       }
       store = null;
-      dir = "asc"
+      dir_value = "asc";
     }
 
 }
   var value;
+  var stopID;
+  var current_fare;
   $(".tablesorter tr").click(function(){
    $(this).addClass('selected').siblings().removeClass('selected');
    value = $(this).find('td:first').html();
+   stopID = $(this).find('td:nth-child(2)').html();
+   current_fare = $(this).find('td:nth-child(3)').html();
 
   });
 
   function pass_data(){
     if (typeof(value) != "undefined"){
-      window.location.href = 'Station_Detail.php?var_value=' + value;
+      window.location.href = 'Station_Detail.php?var_value=' + value + "&stopID=" + stopID + "&current_fare=" + current_fare;
 
+    }
+    else{
+      alert("Please select station");
     }
 
   }
@@ -146,12 +162,16 @@ function sortValue(){
     window.location.href = 'Create_Station.php';
   }
 
+  function return_back(){
+    window.location.href = 'admin.php';
+  }
 
 </script>
 
 <div>
   <button name="Create" onclick="create_station()">Create New Station</button>
   <button name="View" type="submit" onclick="pass_data()">View Station</button>
+  <button name="back" type="submit" onclick="return_back()">Back</button>
 </div>
 
 </body>

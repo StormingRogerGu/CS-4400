@@ -23,6 +23,10 @@ session_start();
     //     $form.find('input:text').val('');
     //     $form.find('input:checkbox').removeAttr('checked');
     // }
+    if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Back'])){
+        include "redirect.php";
+        Redirect("admin.php");
+    }
 
 
 
@@ -59,6 +63,7 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
 	<input type="checkbox" name="suspended_cards" id='suspended_cards' value="show" <?php if(isset($_POST['suspended_cards'])) print "checked='checked'"; ?>> Show Suspended Cards<br>
 	<button type="submit" name="Filter">Update Filter</button>
 	<button type="submit" name="Reset" onclick="clearForm()">Reset</button><br>
+  <input type= "submit" name="Back" value="Back">
     <script type="text/javascript">
         function clearForm(){
 
@@ -69,6 +74,7 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
             document.getElementById("suspended_cards").checked=false;
 
         }
+
     </script>
 
 </form>
@@ -134,7 +140,7 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
          window.location.href = "backend.php?set_name=" + new_owner + "&selected_card=" + selected_card + "&cur_owner=" + cur_owner;
     }
     else{
-        alert("Please Input correctly");
+        alert("Please Select a Breezecard");
     }
 
   }

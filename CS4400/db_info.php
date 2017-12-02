@@ -78,13 +78,7 @@
 	// 	return queryRet($querystring);
 	// }
 
-	function update_fare($cost, $stopID){
-		$querystring = "UPDATE Station "
-			. "SET EnterFare="
-			. "'" . $cost . "' "
-			. "WHERE StopID='" . $stopID . "';";
-		query($querystring);
-	}
+
 
 
 
@@ -229,7 +223,7 @@
 	}
 
 	function getValidend($stopID){
-		$querystring = "SELECT Name, StopID, IsTrain FROM Station WHERE IsTrain IN (SELECT IsTrain FROM (SELECT StopID, IsTrain FROM Station WHERE StopID ='". $stopID . "')T)";
+		$querystring = "SELECT Name, StopID, IsTrain FROM Station WHERE IsTrain IN (SELECT IsTrain FROM (SELECT StopID, IsTrain FROM Station WHERE StopID ='". $stopID . "')T) AND ClosedStatus=0";
 		//return $querystring;
 		return queryRet($querystring);
 	}
@@ -314,6 +308,15 @@
 		query($querystring);
 	}
 
+	function update_fare($cost, $stopID){
+		$querystring = "UPDATE Station "
+			. "SET EnterFare="
+			. "'" . $cost . "' "
+			. "WHERE StopID='" . $stopID . "';";
+		query($querystring);
+	}
+
+
 /////////////////////////////////////////////////////////////////////////
 /////Breezecard Management
 /////////////////////////////////////////////////////////////////////////
@@ -357,7 +360,7 @@
 	}
 
 	function findValidUser($usrname){
-		$querystring = "SELECT Username FROM User "
+		$querystring = "SELECT Username FROM Passenger "
 			. "WHERE Username='" . $usrname . "' "
 			. "AND IsAdmin != 1";
 		//return $querystring;
@@ -433,10 +436,11 @@
 		return queryRet($querystring);
 	}
 
-	function isnullowner($cardnum){
+	function isnullowner($cardnum, $usr){
 		$querystring = "SELECT BreezecardNum FROM Breezecard "
 			. "WHERE BreezecardNum ='" . $cardnum . "' "
-			. "AND BelongsTo IS NULL";
+			. "(AND BelongsTo IS NULL OR BelongsTo='" . $usr ."')";
+		//return $querystring;	
 		return queryRet($querystring);
 	}
 
@@ -480,33 +484,42 @@
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #passenger_flow_report
 	function passenger_flow_report($start_time, $end_time){
-		$querystring = "CREATE VIEW passengerIn AS SELECT StartsAt AS station, SUM(Tripfare) AS sumfare, COUNT(BreezecardNum) AS p_in, StartTime From Trip GROUP BY station; ";
-		queryRet($querystring);
+	  $querystring = "CREATE OR REPLACE VIEW InitialTrip AS SELECT Tripfare, StartTime, BreezecardNum, StartsAt, EndsAt From Trip WHERE ";
+	  if($start_time !== ' '){
+	    $querystring .= "StartTime >='" . $start_time ."' AND ";
+	   }
+	   if($end_time !== ' '){
+	    $querystring .= "StartTime <='" . $end_time . "' AND ";
+	   }
+	   $querystring .= "1 ";
+	   // echo $querystring;
+	  queryRet($querystring);
 
-		$querystring = "CREATE VIEW passengerOut AS SELECT EndsAt AS station, COUNT(BreezecardNum) AS p_out, StartTime FROM Trip GROUP BY station; ";
-		queryRet($querystring);
 
-		$querystring = "CREATE VIEW passengerInJoinOut AS SELECT station, p_in, p_out, sumfare, StartTime FROM passengerIn NATURAL LEFT JOIN passengerOut; ";
-		queryRet($querystring);
-		$querystring = "CREATE OR REPLACE VIEW passengerOutJoinIn AS SELECT station, p_in, p_out, sumfare, StartTime FROM passengerIn NATURAL RIGHT JOIN passengerOut; ";
-		queryRet($querystring);
-		$querystring = "CREATE VIEW passengerInAndOut AS SELECT * FROM passengerInJoinOut UNION SELECT * FROM passengerOutJoinIn; ";
-		queryRet($querystring);
-		$querystring = "CREATE VIEW passenger_flow_report AS SELECT Station.Name AS Name, IFNULL(sumfare, 0) AS revenue, IFNULL(p_in, 0) AS passenger_in, IFNULL(p_out, 0) AS passenger_out, IFNULL(IFNULL(p_in, 0)-IFNULL(p_out, 0), 0) AS flow, StartTime FROM passengerInAndOut INNER JOIN Station on passengerInAndOut.station = Station.stopID; ";
-		// echo $querystring;
-		queryRet($querystring);
-		 $querystring = "SELECT Name, passenger_in, passenger_out, flow, revenue FROM passenger_flow_report WHERE ";
+	  $querystring = "CREATE OR REPLACE VIEW passengerIn AS SELECT StartsAt AS station, SUM(Tripfare) AS sumfare, COUNT(BreezecardNum) AS p_in, StartTime From InitialTrip Group by station; ";
+	  queryRet($querystring);
 
-		 if($start_time !== ' '){
-		 	$querystring .= "StartTime >='" . $start_time ."' AND ";
-		 }
-		 if($end_time !== ' '){
-		 	$querystring .= "StartTime <='" . $end_time . "' AND ";
-		 }
-		 $querystring .= "1";
-		 	// echo $querystring;
-		return queryRet($querystring);
+	  $querystring = "CREATE OR REPLACE VIEW passengerOut AS SELECT EndsAt AS station, COUNT(BreezecardNum) AS p_out, StartTime FROM InitialTrip GROUP BY station; ";
+	  queryRet($querystring);
 
-	}
+	  $querystring = "CREATE OR REPLACE VIEW passengerInJoinOut AS SELECT station, p_in, p_out, sumfare, StartTime FROM passengerIn NATURAL LEFT JOIN passengerOut; ";
+	  queryRet($querystring);
+
+	  $querystring = "CREATE OR REPLACE VIEW passengerOutJoinIn AS SELECT station, p_in, p_out, sumfare, StartTime FROM passengerIn NATURAL RIGHT JOIN passengerOut; ";
+	  queryRet($querystring);
+
+	  $querystring = "CREATE OR REPLACE VIEW passengerInAndOut AS SELECT * FROM passengerInJoinOut UNION SELECT * FROM passengerOutJoinIn; ";
+	  queryRet($querystring);
+
+	  $querystring = "CREATE OR REPLACE VIEW passenger_flow_report AS SELECT Station.Name AS Name, IFNULL(sumfare, 0) AS revenue, IFNULL(p_in, 0) AS passenger_in, IFNULL(p_out, 0) AS passenger_out, IFNULL(IFNULL(p_in, 0)-IFNULL(p_out, 0), 0) AS flow, StartTime FROM passengerInAndOut INNER JOIN Station on passengerInAndOut.station = Station.stopID; ";
+	  queryRet($querystring);
+
+	   $querystring = "SELECT Name, SUM(passenger_in) AS passenger_in, SUM(passenger_out) AS passenger_out, SUM(flow) AS flow, SUM(revenue) AS revenue FROM passenger_flow_report";
+	   $querystring .= " GROUP BY Name;";
+
+	   // echo $querystring;
+	  return queryRet($querystring);
+
+ }
 
 ?>

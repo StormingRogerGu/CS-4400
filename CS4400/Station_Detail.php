@@ -33,22 +33,31 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
   <?php
     include 'db_info.php';
 
-    $sdata = Get_Station_info();
-    $currentid;
-    for ($i = 0; $i < count($sdata); $i++){
-      if ($station === $sdata[$i]['Name']){
-        $currentid = $sdata[$i]['StopID'];
-        echo $sdata[$i]['StopID'];
-      }
-    }
+    // $sdata = Get_Station_info();
+    // $currentid;
+    // for ($i = 0; $i < count($sdata); $i++){
+    //   if ($station === $sdata[$i]['Name']){
+    //     $currentid = $sdata[$i]['StopID'];
+    //     echo $sdata[$i]['StopID'];
+    //   }
+    // }
+    $currentid = $_GET['stopID'];
+    echo $currentid;
 
     ?><br>
 
-  Fare($) <input type="text" name="fare" method> <button type="submit" name="updatefare">Update Fare</button>
+  Fare($) <input type="text" name="fare" value="<?php $cur_fare = $_GET['current_fare']; echo $cur_fare;?>">
+  <button type="submit" name="updatefare" >Update Fare</button>
   <?php
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updatefare'])){
       $new_fare = $_POST['fare'];
-      update_fare($new_fare, $currentid);
+      if ($new_fare >= 0 && $new_fare <= 50){
+        update_fare($new_fare, $currentid);
+        echo '<script type="text/javascript">window.location.href = "Station_Management.php"</script>';
+      }
+      else{
+        echo '<script type="text/javascript">alert("Please Input valid fare");</script>';
+      }
     }
 
   ?>

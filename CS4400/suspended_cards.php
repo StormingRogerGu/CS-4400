@@ -24,9 +24,9 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
 <table style="width:80%" id="station" class="table">
   <caption>Suspended Cards</caption>
   <tr>
-    <th>Card #</th>
+    <th onclick="sortTable(0)" style="color: blue">Card #</th>
     <th>New Owner</th>
-    <th>Date Suspended</th>
+    <th onclick="sortTable(2)" style="color: blue">Date Suspended</th>
     <th>Previous Owner</th>
   </tr>
 
@@ -46,6 +46,7 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
 <div>
   <button name="new" type="submit" onclick="pass_data()">Assion Selected Card to New Owner</button>
   <button name="pre" type="submit" onclick="pass_data2()">Assign Selected Card to Previous Owner</button>
+  <button name="back" type="submit" onclick="return_back()">Back</button>
 </div>
 
 <p id="demo"></p>
@@ -54,6 +55,51 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
   var cardNum;
   var new_owner;
   var pre_owner;
+  function sortTable(n) {
+  var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+  table = document.getElementById("station");
+  switching = true;
+  dir = "asc";
+  while (switching) {
+
+    switching = false;
+    rows = table.getElementsByTagName("TR");
+
+    for (i = 1; i < (rows.length - 1); i++) {
+
+      shouldSwitch = false;
+
+      x = rows[i].getElementsByTagName("TD")[n];
+      y = rows[i + 1].getElementsByTagName("TD")[n];
+
+      if (dir == "asc") {
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          shouldSwitch= true;
+          break;
+        }
+      } else if (dir == "desc") {
+        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+
+          shouldSwitch= true;
+          break;
+        }
+      }
+    }
+    if (shouldSwitch) {
+
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+
+      switchcount ++;
+    } else {
+
+      if (switchcount == 0 && dir == "asc") {
+        dir = "desc";
+        switching = true;
+      }
+    }
+  }
+}
   $(".table tr").click(function(){
     $(this).addClass('selected').siblings().removeClass('selected');
     cardNum = $(this).find('td:nth-child(1)').html(); 
@@ -79,6 +125,10 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
     //});
     }
 
+  }
+
+  function return_back(){
+    window.location.href = 'admin.php';
   }
 
 </script>
