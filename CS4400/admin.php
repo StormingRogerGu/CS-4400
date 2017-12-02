@@ -51,7 +51,7 @@
       <div class="row">
         <div class="col-lg-4">
           <h2>Breeze Card Management</h2>
-          <p><a class="btn btn-primary" href="Breezecard_Manamgement.php" role="button" name="breeze_card_management">Breeze Card Management</a></p>
+          <p><a class="btn btn-primary" href="Breezecard_Management.php" role="button" name="breeze_card_management">Breeze Card Management</a></p>
         </div>
         <div class="col-lg-4">
           <h2>Passenger Flow Report</h2>

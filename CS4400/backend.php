@@ -116,6 +116,12 @@
 	 		}
 	 		else{
 	 			UpdateCardBelongs($new_owner, $card);
+	 			if (checkPrivousOwner($cur_owner) === null){
+	 				$new_card_num = generateCardnum();
+	 				InsertBreezecard($cur_owner, $new_card_num);
+	 				echo "11";
+	 			}
+	 			
 	 		}
 	 	}
 
