@@ -317,6 +317,13 @@
 /////////////////////////////////////////////////////////////////////////
 /////Breezecard Management
 /////////////////////////////////////////////////////////////////////////
+	function check_suspended($Breezecard){
+		$querystring = "SELECT count(1) from Conflict WHERE BreezecardNum = ";
+		$querystring .=  "$Breezecard" . ";";
+			// echo $querystring;
+		return queryRet($querystring);
+	}
+
 	function manage_cards($suspended, $owner, $cardnum, $minValue, $maxValue){
 		$querystring = "SELECT BreezecardNum, Value, BelongsTo FROM Breezecard "
 			. "WHERE ";

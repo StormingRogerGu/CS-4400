@@ -67,6 +67,9 @@
 
     </div> <!-- /container -->
 
+    <form action="logout.php" method="post">
+    <input type="submit" value="Log out" name="Log out">
+    </form>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

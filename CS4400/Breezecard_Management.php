@@ -1,9 +1,9 @@
-<?php 
+<?php
 session_start();
      ob_start();
 ?>
 <?php
-	 
+
 	 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Filter'])){
          include "db_info.php";
          $owner = $_POST['passenger_name'];
@@ -16,14 +16,14 @@ session_start();
     }
     // if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Reset'])){
     //     resetForm($form_filter);
-    // } 
-    
+    // }
+
 
     // function resetForm($form) {
     //     $form.find('input:text').val('');
     //     $form.find('input:checkbox').removeAttr('checked');
     // }
-      
+
 
 
 ?>
@@ -53,7 +53,7 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
 <form method="post" name="form_filter">
 	<h1>Breeze Cards</h1>
 	<h2>Search/Filter</h2>
-	Owner: <input type="text" name="passenger_name" id='passenger_name' value="<?php print isset($_POST['card_number'])? $_POST['passenger_name']:'';?>"><br>  	
+	Owner: <input type="text" name="passenger_name" id='passenger_name' value="<?php print isset($_POST['card_number'])? $_POST['passenger_name']:'';?>"><br>
 	Card Number: <input type="text" name="card_number" id='card_number' value="<?php print isset($_POST['card_number'])? $_POST['card_number']:'';?>"><br>
 	Value between <input type="text" name="low_value" id='low_value' value="<?php print isset($_POST['low_value'])? $_POST['low_value']:'';?>"> and <input type="text" name="high_value" id='high_value' value="<?php print isset($_POST['high_value'])? $_POST['high_value']:'';?>"><br>
 	<input type="checkbox" name="suspended_cards" id='suspended_cards' value="show" <?php if(isset($_POST['suspended_cards'])) print "checked='checked'"; ?>> Show Suspended Cards<br>
@@ -90,9 +90,15 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
   <?php
     for ($i = 0; $i < count($sdata); $i++){
       $row = $sdata[$i];
-      echo "<tr><td>" . $row['BreezecardNum'] . "</td><td>" . $row['Value'] . "</td><td>" . $row['BelongsTo'] . "</td><td>";
+      $checkresult = check_suspended($row['BreezecardNum']);
+      if($checkresult[0]['count(1)'] === '0'){
+        echo "<tr><td>" . $row['BreezecardNum'] . "</td><td>" . $row['Value'] . "</td><td>" . $row['BelongsTo'] . "</td><td>";
+      }
+      else{
+        echo "<tr><td>" . $row['BreezecardNum'] . "</td><td>" . $row['Value'] . "</td><td>" . 'Suspended' . "</td><td>";
+      }
     }
-    ?>   
+    ?>
 </table>
 </div>
 
@@ -105,7 +111,7 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
   $(".table tr").click(function(){
     $(this).addClass('selected').siblings().removeClass('selected');
     selected_card = $(this).find('td:nth-child(1)').html();
-    cur_owner = $(this).find('td:nth-child(3)').html(); 
+    cur_owner = $(this).find('td:nth-child(3)').html();
   });
 
   function transfer_value(){
