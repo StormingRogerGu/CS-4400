@@ -43,6 +43,7 @@
 		$querystring = "SELECT Name FROM Station "
 			. "WHERE "
 			. "StopID='" . $stopID . "'";
+		return $querystring;
 		return queryRet($querystring);
 	}
 
@@ -68,17 +69,6 @@
 		$querystring = "SELECT * FROM Trip";
 		return queryRet($querystring);
 	}
-
-
-
-
-
-	// function Get_intersection(){
-	// 	$querystring = "SELECT * FROM BusStationIntersection";
-	// 	return queryRet($querystring);
-	// }
-
-
 
 
 
@@ -361,9 +351,8 @@
 
 	function findValidUser($usrname){
 		$querystring = "SELECT Username FROM Passenger "
-			. "WHERE Username='" . $usrname . "' "
-			. "AND IsAdmin != 1";
-		//return $querystring;
+			. "WHERE Username='" . $usrname . "'";
+		return $querystring;
 		return queryRet($querystring);
 	}
 
@@ -438,8 +427,8 @@
 
 	function isnullowner($cardnum, $usr){
 		$querystring = "SELECT BreezecardNum FROM Breezecard "
-			. "WHERE BreezecardNum ='" . $cardnum . "' "
-			. "(AND BelongsTo IS NULL OR BelongsTo='" . $usr ."')";
+			. "WHERE BreezecardNum ='" . $cardnum . "' AND "
+			. "(BelongsTo IS NULL OR BelongsTo='" . $usr ."')";
 		//return $querystring;	
 		return queryRet($querystring);
 	}
@@ -511,11 +500,11 @@
 	  $querystring = "CREATE OR REPLACE VIEW passengerInAndOut AS SELECT * FROM passengerInJoinOut UNION SELECT * FROM passengerOutJoinIn; ";
 	  queryRet($querystring);
 
-	  $querystring = "CREATE OR REPLACE VIEW passenger_flow_report AS SELECT Station.Name AS Name, IFNULL(sumfare, 0) AS revenue, IFNULL(p_in, 0) AS passenger_in, IFNULL(p_out, 0) AS passenger_out, IFNULL(IFNULL(p_in, 0)-IFNULL(p_out, 0), 0) AS flow, StartTime FROM passengerInAndOut INNER JOIN Station on passengerInAndOut.station = Station.stopID; ";
+	  $querystring = "CREATE OR REPLACE VIEW passenger_flow_report AS SELECT Station.Name AS Name, IFNULL(sumfare, 0) AS revenue, IFNULL(p_in, 0) AS passenger_in, IFNULL(p_out, 0) AS passenger_out, IFNULL(IFNULL(p_in, 0)-IFNULL(p_out, 0), 0) AS flow,  station FROM passengerInAndOut INNER JOIN Station on passengerInAndOut.station = Station.stopID; ";
 	  queryRet($querystring);
 
 	   $querystring = "SELECT Name, SUM(passenger_in) AS passenger_in, SUM(passenger_out) AS passenger_out, SUM(flow) AS flow, SUM(revenue) AS revenue FROM passenger_flow_report";
-	   $querystring .= " GROUP BY Name;";
+	   $querystring .= " GROUP BY station;";
 
 	   // echo $querystring;
 	  return queryRet($querystring);

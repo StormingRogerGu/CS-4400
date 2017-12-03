@@ -4,7 +4,10 @@
 ?>
 
 <?php
-########Assign To New Owner
+#############################################################
+########
+##Manage Suspended Cards
+//assign new 
 	if (isset($_GET['assign_new'])){
 		include "db_info.php";
 		include 'redirect.php';
@@ -44,6 +47,7 @@
 		Redirect('suspended_cards.php');
 
 	 }
+	 //assign old
 	if (isset($_GET['assign_old'])){
 		include 'db_info.php';
 		include 'redirect.php';
@@ -66,7 +70,11 @@
 		Redirect('suspended_cards.php');
 
 	}
+/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////
+//////Breezecard Management
 
+/////// set value
 	 if (isset($_GET['set_value']) && isset($_GET['selected_card'])){
 	 	include 'db_info.php';
 	 	include 'redirect.php';
@@ -83,7 +91,7 @@
 	 		Redirect('Breezecard_Management.php');
 	 	}
 	 }
-
+///////Transfer card to new owner
 	 if (isset($_GET['set_name']) && isset($_GET['selected_card']) && isset($_GET['cur_owner'])){
 	 	include 'db_info.php';
 	 	include 'redirect.php';
@@ -133,7 +141,9 @@
 	 	
 
 	 }
-////////Manage cards php
+////////Manage cards (each passenger)
+/////////////////////////////////////
+	 ///add new card
 	 if (isset($_GET['new_card'])){
 	 	include 'db_info.php';
 	 	include 'redirect.php';
@@ -153,7 +163,7 @@
 
 	 	Redirect('Manage_Cards.php');
 	 }
-
+	 ///add value
 	 if (isset($_GET['selected_cardmc'])){
 	 	include 'db_info.php';
 	 	include 'redirect.php';
@@ -174,18 +184,29 @@
 	 	
 
 	 }
-
+	 ///delete card
 	 if (isset($_GET['selected_delete'])){
 	 	include 'db_info.php';
 	 	include 'redirect.php';
+	 	$usr= $_SESSION['user']["name"];
 	 	$delete_card = $_GET['selected_delete'];
 	 	RemoveCard($delete_card);
+
 	 	echo $delete_card;
+	 	
+	 	if (checkPrivousOwner($usr)===null){
+	 		$new_card_num = generateCardnum();
+	 		InsertBreezecard($usr, $new_card_num);
+	 	}
 	 	Redirect('Manage_Cards.php');
 	 }
 
 	
+////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+#####Welcome to passenger page
 
+	 ///start trip
 	if (isset($_GET['selected_card_wcm'])){
 	 	include 'db_info.php';
 	 	include 'redirect.php';
@@ -217,6 +238,7 @@
 	 	
 	 }
 
+	 ///end trip
 	 if (isset($_GET['selected_card_end'])){
 	 	include 'db_info.php';
 	 	include 'redirect.php';

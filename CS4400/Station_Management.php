@@ -20,7 +20,7 @@ td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
 
 <body>
 <table class="tablesorter" style="width:80%" id="station" cellspacing="1">
-  <caption>Monthly savings</caption>
+  <caption>Station Management</caption>
   <thead>
     <tr>
     <th onclick="sortTable(0)" style="color: blue">Station Name</th>
